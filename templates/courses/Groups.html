@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="Group-container">
+    <div class="Group-header">
+        <h1>All Groups</h1>
+        <div class="Group-category-dropdown">
+            <select id="Group-category-select">
+                <option value="all">All Categories</option>
+                <option value="python">Python</option>
+                <option value="web-development">Web Development</option>
+                <option value="sql">SQL</option>
+                <option value="php">PHP</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="Group-list">
+        {% for Group in Groups %}
+        <div class="Group-item Group-{{ Group.category|lower|slugify }}">
+            <img src="{{ Group.image.url }}" alt="{{ Group.title }}" class="Group-image">
+            <div class="Group-info">
+                <h2>{{ Group.title }}</h2>
+                <p>{{ Group.instructor.name }}{% if Group.instructor.credentials %}, {{ Group.instructor.credentials }}{% endif %}</p>
+                <div class="Group-price">
+                </div>
+                <a href="{% url 'Group_detail' Group.id %}" class="details-btn">Details</a>
+            </div>
+        </div>
+        {% empty %}
+        <div class="no-Groups">
+            <p>No Groups available at the moment.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+// JavaScript for category filtering
+document.getElementById('Group-category-select').addEventListener('change', function() {
+    const selectedCategory = this.value;
+    const GroupItems = document.querySelectorAll('.Group-item');
+    
+    GroupItems.forEach(item => {
+        if (selectedCategory === 'all' || item.classList.contains('Group-' + selectedCategory)) {
+            item.style.display = 'none';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+});
+</script>
+{% if user.is_authenticated and user.user_type == "TeamLeader" %}
+<a href="{% url 'add_Group' %}">
+  <button class="add-Group-fab" title="Add Group">+</button>
+</a>
+{% endif %}
+
+<style>
+.add-Group-fab {
+    position: fixed;
+    left: 32px;
+    bottom: 32px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: #fff;
+    border-radius: 50%;
+    font-size: 2.5rem;
+    font-weight: bold;
+    box-shadow: 0 4px 16px rgba(78,84,200,0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    z-index: 1000;
+    transition: background 0.3s, transform 0.2s;
+    border: none;
+}
+.add-Group-fab:hover {
+    background: linear-gradient(135deg, #8f94fb, #4e54c8);
+    transform: scale(1.12);
+    color: #fff;
+    text-decoration: none;
+}
+.details-btn {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 18px;
+    background: #4e54c8;
+    color: #fff;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    border: none;
+}
+.details-btn:hover {
+    background: #8f94fb;
+    color: #fff;
+}
+</style>
+{% endblock %}

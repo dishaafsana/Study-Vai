@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{% static 'css/routine.css' %}" />
+{% endblock styles %}
+
+{% block content %}
+    <div class="routine-container">
+        <h1>Class Routine</h1>
+        <table>
+            <thead>
+                <tr>
+                    {% for slot in time_slots %}
+                        <th>{{ slot }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for day_row in timetable %}
+                <tr>
+                    {% for cell in day_row %}
+                        {% if forloop.first %}
+                            <td>{{ cell }}</td>  <!-- Day name -->
+                        {% else %}
+                            <td class="{% if cell %}class-cell{% endif %}">
+                                {% if cell %}{{ cell.code }}{% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock content %}
