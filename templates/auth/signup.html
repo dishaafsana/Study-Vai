@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .signup-hero-bg {
+        position: relative;
+        width: 100vw;
+        min-height: 100vh;
+        background: url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=1500&q=80') center center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .signup-hero-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(44, 62, 80, 0.75);
+        z-index: 1;
+    }
+    .signup-content-box {
+        position: relative;
+        z-index: 2;
+        background: rgba(255,255,255,0.97);
+        border-radius: 18px;
+        box-shadow: 0 4px 32px rgba(44,62,80,0.13);
+        max-width: 420px;
+        width: 100%;
+        padding: 40px 32px 32px 32px;
+        margin: 40px 0;
+        text-align: center;
+    }
+    .signup-content-box h1 {
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #23272b;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+        animation: pop 1.5s;
+    }
+    .signup-content-box p {
+        color: #4a5568;
+        font-size: 1.08rem;
+        margin-bottom: 24px;
+        animation: fade-in 1.2s;
+    }
+    .form-group {
+        margin-bottom: 18px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #23272b;
+        margin-bottom: 6px;
+    }
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: #f7fafc;
+        transition: border 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+        border: 1.5px solid #3182ce;
+        outline: none;
+        background: #fff;
+    }
+    .form-error {
+        color: #e53e3e;
+        font-size: 0.97rem;
+        margin-top: 4px;
+    }
+    .signup-button {
+        width: 100%;
+        padding: 15px;
+        background-color: #3182ce;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 16px rgba(49,130,206,0.10);
+        margin-top: 10px;
+        margin-bottom: 8px;
+        animation: pop 1.5s;
+    }
+    .signup-button:hover {
+        background: #2563eb;
+        box-shadow: 0 6px 24px rgba(49,130,206,0.13);
+    }
+    .login-prompt {
+        margin-top: 18px;
+        font-size: 1rem;
+        color: #23272b;
+        animation: fade-in 1.2s;
+    }
+    .login-prompt a {
+        color: #3182ce;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.18s;
+    }
+    .login-prompt a:hover {
+        color: #2563eb;
+        text-decoration: underline;
+    }
+    @keyframes pop {
+        0% { transform: scale(0.95); }
+        60% { transform: scale(1.05);}
+        100% { transform: scale(1);}
+    }
+    @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    @media (max-width: 600px) {
+        .signup-content-box {
+            padding: 24px 8px 18px 8px;
+        }
+        .signup-content-box h1 {
+            font-size: 1.3rem;
+        }
+    }
+</style>
+<div class="signup-hero-bg">
+    <div class="signup-hero-overlay"></div>
+    <div class="signup-content-box">
+        <h1 class="site-name">Join Study Vai to activate your Learning</h1>
+        <p>Sign up to Study Vai to get started!</p>
+        <form method="post" class="signup-form" action="{% url 'users:register' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="form-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="form-group">
+                <label for="username">Full Name</label>
+                <input type="text" id="username" name="username" required placeholder="Enter your full name">
+                {% if form.username.errors %}
+                    <div class="form-error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email">
+                {% if form.email.errors %}
+                    <div class="form-error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="password1">Password</label>
+                <input type="password" id="password1" name="password1" required placeholder="Enter your password">
+                {% if form.password1.errors %}
+                    <div class="form-error">{{ form.password1.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="user_type">I am a:</label>
+                <select id="user_type" name="user_type" required>
+                   <option value="" disabled selected>Select your role</option>
+                     <option value="student">Student</option>
+                <option value="TeamLeader">TeamLeader</option>
+                    </select>
+                {% if form.user_type.errors %}
+                    <div class="form-error">{{ form.user_type.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="profile_picture">Profile Image</label>
+                <input type="file" id="profile_picture" name="profile_picture" accept="image/*">
+                {% if form.profile_picture.errors %}
+                    <div class="form-error">{{ form.profile_picture.errors }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="signup-button">Sign Up</button>
+        </form>
+        <p class="login-prompt">Already have an account? <a href="{% url 'users:login' %}">Log in</a></p>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+    .login-hero-bg {
+        position: relative;
+        width: 100vw;
+        min-height: 100vh;
+        background: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1500&q=80') center center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .login-hero-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(44, 62, 80, 0.75);
+        z-index: 1;
+    }
+    .login-content-box {
+        position: relative;
+        z-index: 2;
+        background: rgba(255,255,255,0.97);
+        border-radius: 18px;
+        box-shadow: 0 4px 32px rgba(44,62,80,0.13);
+        max-width: 400px;
+        width: 100%;
+        padding: 40px 32px 32px 32px;
+        margin: 40px 0;
+        text-align: center;
+    }
+    .login-content-box h1 {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #23272b;
+        margin-bottom: 12px;
+        letter-spacing: 1px;
+    }
+    .login-content-box p {
+        color: #4a5568;
+        font-size: 1.08rem;
+        margin-bottom: 24px;
+    }
+    .form-group {
+        margin-bottom: 18px;
+        text-align: left;
+    }
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #23272b;
+        margin-bottom: 6px;
+    }
+    .form-group input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 1rem;
+        background: #f7fafc;
+        transition: border 0.2s;
+    }
+    .form-group input:focus {
+        border: 1.5px solid #3182ce;
+        outline: none;
+        background: #fff;
+    }
+    .form-error {
+        color: #e53e3e;
+        font-size: 0.97rem;
+        margin-top: 4px;
+    }
+    .login-button {
+        background: #3182ce;
+        color: #fff;
+        padding: 12px 0;
+        width: 100%;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-top: 10px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 2px 8px rgba(49,130,206,0.10);
+    }
+    .login-button:hover {
+        background: #2563eb;
+    }
+    .create-account {
+        margin-top: 16px;
+        font-size: 1rem;
+        color: #23272b;
+    }
+    .create-account a {
+        color: #3182ce;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.18s;
+    }
+    .create-account a:hover {
+        color: #2563eb;
+        text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+        .login-content-box {
+            padding: 24px 8px 18px 8px;
+        }
+        .login-content-box h1 {
+            font-size: 1.4rem;
+        }
+    }
+</style>
+
+<div class="login-hero-bg">
+    <div class="login-hero-overlay"></div>
+    <div class="login-content-box">
+        <h1>Log in</h1>
+        <p>Log in to Study Vai to get started!</p>
+        <form method="post" action="{ }">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="form-error">{{ form.non_field_errors }}</div>
+            {% endif %}
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="username" required placeholder="Enter your email">
+                {% if form.username.errors %}
+                    <div class="form-error">{{ form.username.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password">
+                {% if form.password.errors %}
+                    <div class="form-error">{{  }}</div>
+                {% endif %}
+            </div>
+            <button type="submit" class="login-button">Login</button>
+        </form>
+        <p class="create-account">
+            Need a Study Vai account?
+            <a href="{% url 'users:learner' %}">Create an account</a>
+        </p>
+    </div>
+</div>
+{% endblock content %}
