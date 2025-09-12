@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="marks-container">
+    <div class="profile-header">
+        <h1>Welcome, {{ user.username }}</h1>
+    </div>
+    <div class="joined-group-info">
+        {% if user.joined_group %}
+            <p>You have joined the group: <strong>{{ user.joined_group.title }}</strong></p>
+        {% else %}
+            <p>You have not joined any group yet.</p>
+        {% endif %}
+    </div>
+    <div class="action-buttons">
+        <a href="{% url 'users:student_profile' %}" class="btn">Back to Profile</a>
+    </div>
+</div>
+{% endblock %}
