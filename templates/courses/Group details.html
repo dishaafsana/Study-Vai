@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="group-details-hero">
+    <div class="group-details-card">
+        <div class="group-image-box">
+            <img src="{{ Group.image.url }}" alt="{{ Group.title }}" class="group-image-main">
+        </div>
+        <div class="group-details-main">
+            <h1 class="group-title">{{ Group.title }}</h1>
+            <div class="group-instructor">
+                <span class="instructor-label">Instructor:</span> {{ Group.instructor.name }}
+                {% if Group.instructor.credentials %}<span class="instructor-cred">, {{ Group.instructor.credentials }}</span>{% endif %}
+            </div>
+            <ul class="group-info-list">
+                <li><span>Category:</span> <span class="category-pill">{{ Group.category }}</span></li>
+            </ul>
+            <div class="group-actions">
+                <a href="{% url 'Groups' %}" class="blue-button">Back to Groups</a>
+                {% if user.is_authenticated and user.user_type == "student" %}
+                <form method="post" action="{% url 'join_group' Group.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="blue-button">Join Group</button>
+                </form>
+                {% endif %}
+                {% if user.is_authenticated and user.user_type == "TeamLeader" %}
+                <a href="{% url 'update_Group' Group.id %}" class="blue-button" style="background:#4e54c8;">Edit</a>
+                <a href="{% url 'delete_Group' Group.id %}" class="blue-button" style="background:#e74c3c;">Delete</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+.group-details-hero {
+    min-height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+    padding: 40px 0;
+}
+.group-details-card {
+    background: #fff;
+    border-radius: 22px;
+    box-shadow: 0 8px 32px rgba(78,84,200,0.18);
+    max-width: 600px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    padding: 36px 36px 32px 36px;
+    align-items: flex-start;
+    animation: fadeInUp 0.7s cubic-bezier(.39,.575,.565,1) both;
+}
+.group-image-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.group-image-main {
+    width: 220px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(78,84,200,0.10);
+    background: #f3f4f6;
+}
+.group-details-main {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.group-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #4e54c8;
+    margin-bottom: 6px;
+    margin-top: 0;
+}
+.group-instructor {
+    color: #555;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+}
+.instructor-label {
+    font-weight: 600;
+    color: #2d3748;
+}
+.instructor-cred {
+    color: #888;
+    font-size: 0.98em;
+}
+.group-info-list {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 0;
+    list-style: none;
+}
+.group-info-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 1.05rem;
+    color: #333;
+}
+.group-info-list li:last-child {
+    border-bottom: none;
+}
+.category-pill {
+    background: #e0e7ff;
+    color: #4e54c8;
+    border-radius: 12px;
+    padding: 2px 14px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+.group-actions {
+    display: flex;
+    gap: 14px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+.blue-button {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: #fff !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.08rem;
+    font-weight: 600;
+    padding: 10px 22px;
+    transition: background 0.2s;
+    box-shadow: 0 2px 8px rgba(72,187,255,0.07);
+    text-decoration: none;
+    display: inline-block;
+}
+.blue-button:hover {
+    background: #2563eb;
+    color: #fff !important;
+}
+@media (max-width: 900px) {
+    .group-details-card {
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+        padding: 24px 8px 18px 8px;
+    }
+    .group-image-main {
+        width: 100%;
+        height: 180px;
+        max-width: 320px;
+    }
+}
+</style>
+{% endblock %}
