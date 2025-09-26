@@ -26,7 +26,7 @@ INSTALLED_APPS = [
     "notes",
     "routine",
     "users",
-    # Add your 'Groups' app here
+    # Aikhne app create kore add korsi
 ]
 
 MIDDLEWARE = [
