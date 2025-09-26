@@ -9,7 +9,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home, name="home"),
     path("signup/", views.signup, name="signup"),
-    # Other app urls
+    # users gular jonno
     path("", include("users.urls")),
     path("", include("Groups.urls")),
     path("", include("notes.urls")),
