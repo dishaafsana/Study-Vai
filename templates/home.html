@@ -1,0 +1,84 @@
+<!-- filepath: d:\projects\contract\Study Group\templates\home.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    .hero-bg {
+        position: relative;
+        width: 100vw;
+        min-height: 100vh;
+        background: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=1500&q=80') center center/cover no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+    .hero-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(44, 62, 80, 0.75);
+        z-index: 1;
+    }
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        color: #fff;
+        width: 100%;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 60px 20px;
+    }
+    .hero-title {
+        font-size: 4rem;
+        font-weight: 800;
+        margin-bottom: 24px;
+        letter-spacing: 2px;
+        line-height: 1.1;
+    }
+    .hero-desc {
+        font-size: 1.35rem;
+        font-weight: 400;
+        margin-bottom: 40px;
+        color: #e2e8f0;
+    }
+    .signup-btn {
+        background: #ff4f6d;
+        color: #fff;
+        padding: 18px 48px;
+        border: none;
+        border-radius: 30px;
+        font-size: 1.25rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: background 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 24px rgba(255,79,109,0.15);
+        cursor: pointer;
+        display: inline-block;
+    }
+    .signup-btn:hover {
+        background: #e43c5c;
+        box-shadow: 0 6px 32px rgba(255,79,109,0.22);
+    }
+    @media (max-width: 700px) {
+        .hero-title { font-size: 2.2rem; }
+        .hero-content { padding: 40px 10px; }
+    }
+</style>
+
+<div class="hero-bg">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <div class="hero-title">Launch<br>Your Study Group Now!</div>
+        <div class="hero-desc">
+            Discover, join, or create study groups for any subject.<br>
+            Empower your learning journey with a collaborative community.
+        </div>
+        {% if user.is_authenticated %}
+            <div style="margin-top:32px;font-size:1.5rem;font-weight:600;color:#fff;">Welcome, {{ user.username }}!</div>
+        {% else %}
+            <a href="{% url 'signup' %}" class="signup-btn">SIGN UP</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}
