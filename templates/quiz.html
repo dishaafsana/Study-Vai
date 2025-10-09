@@ -1,0 +1,904 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+{% csrf_token %}
+<div class="quiz-hero">
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <!-- AI INTEGRATION #1: AI-Powered Branding -->
+            <h1 class="quiz-title">AI-Powered Quiz Center</h1>
+            <!-- AI INTEGRATION #2: AI-tailored learning journey messaging -->
+            <p class="quiz-subtitle">Test your knowledge with intelligent quizzes tailored to your learning journey</p>
+        </div>
+
+        <div class="quiz-categories">
+            <div class="category-card">
+                <div class="category-icon">🐍</div>
+                <h3>Python</h3>
+                <p>Test your Python programming skills</p>
+                <button class="quiz-btn" onclick="startQuiz('python')">Start Quiz</button>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">🌐</div>
+                <h3>Web Development</h3>
+                <p>HTML, CSS, JavaScript challenges</p>
+                <button class="quiz-btn" onclick="startQuiz('web-development')">Start Quiz</button>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">🗄️</div>
+                <h3>SQL</h3>
+                <p>Database queries and management</p>
+                <button class="quiz-btn" onclick="startQuiz('sql')">Start Quiz</button>
+            </div>
+            
+            <div class="category-card">
+                <div class="category-icon">🐘</div>
+                <h3>PHP</h3>
+                <p>Server-side programming concepts</p>
+                <button class="quiz-btn" onclick="startQuiz('php')">Start Quiz</button>
+            </div>
+        </div>
+
+        <!-- Quiz Interface (Hidden by default) -->
+        <div id="quiz-interface" class="quiz-interface" style="display: none;">
+            <div class="quiz-card">
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="question-counter">Question 1 of 5</span>
+                </div>
+                
+                <div class="question-section">
+                    <h2 id="question-text">Loading question...</h2>
+                    <div id="options-container" class="options-container">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="quiz-actions">
+                    <button id="submit-answer" class="quiz-action-btn" onclick="submitAnswer()">Submit Answer</button>
+                    <button id="next-question" class="quiz-action-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+                </div>
+                
+                <!-- AI INTEGRATION #3: AI Feedback Display Area -->
+                <!-- This div shows intelligent explanations and personalized feedback -->
+                <div id="ai-feedback" class="ai-feedback" style="display: none;">
+                    <!-- AI-generated explanations and adaptive feedback appear here -->
+                </div>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="quiz-stats">
+            <h2>Your Quiz Performance</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Quizzes Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0%</div>
+                    <div class="stat-label">Average Score</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">0</div>
+                    <div class="stat-label">Study Streak</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="login-prompt">
+            <h3>Login to Track Your Progress</h3>
+            <p>Sign in to save your quiz results and track your learning journey</p>
+            <a href="{% url 'users:login' %}" class="blue-button">Login Now</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+.quiz-hero {
+    min-height: 90vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 60px 20px;
+}
+
+.quiz-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.quiz-header {
+    text-align: center;
+    color: white;
+    margin-bottom: 60px;
+}
+
+.quiz-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.quiz-subtitle {
+    font-size: 1.3rem;
+    opacity: 0.9;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.quiz-categories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 60px;
+}
+
+.category-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 30px;
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.category-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+}
+
+.category-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.category-card h3 {
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 12px;
+}
+
+.category-card p {
+    color: #718096;
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+}
+
+.quiz-btn {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quiz-btn:hover {
+    background: linear-gradient(135deg, #8f94fb, #4e54c8);
+    transform: translateY(-2px);
+}
+
+.quiz-stats {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    margin-bottom: 40px;
+}
+
+.quiz-stats h2 {
+    color: white;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+}
+
+.stat-card {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 30px 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 8px;
+}
+
+.stat-label {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.1rem;
+}
+
+.login-prompt {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 40px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.login-prompt h3 {
+    color: white;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+}
+
+.login-prompt p {
+    color: rgba(255,255,255,0.8);
+    font-size: 1.1rem;
+    margin-bottom: 25px;
+}
+
+.blue-button {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: #fff !important;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 14px 32px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(72,187,255,0.2);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.blue-button:hover {
+    background: linear-gradient(135deg, #8f94fb, #4e54c8);
+    transform: translateY(-2px);
+    color: #fff !important;
+}
+
+@media (max-width: 768px) {
+    .quiz-title {
+        font-size: 2.2rem;
+    }
+    
+    .quiz-categories {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .category-card {
+        padding: 30px 20px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+/* Quiz Interface Styles */
+.quiz-interface {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.quiz-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    margin-bottom: 40px;
+}
+
+.quiz-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.progress-bar {
+    flex: 1;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    margin-right: 20px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    width: 20%;
+    transition: width 0.5s ease;
+}
+
+#question-counter {
+    font-weight: 600;
+    color: #4e54c8;
+}
+
+.question-section {
+    margin-bottom: 30px;
+}
+
+#question-text {
+    font-size: 1.5rem;
+    color: #2d3748;
+    margin-bottom: 25px;
+    line-height: 1.4;
+}
+
+.options-container {
+    display: grid;
+    gap: 15px;
+}
+
+.option-btn {
+    background: #f7fafc;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 15px 20px;
+    text-align: left;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.option-btn:hover {
+    border-color: #4e54c8;
+    background: #e0e7ff;
+}
+
+.option-btn.selected {
+    border-color: #4e54c8;
+    background: #e0e7ff;
+}
+
+.option-btn.correct {
+    border-color: #10b981;
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.option-btn.incorrect {
+    border-color: #ef4444;
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.quiz-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.quiz-action-btn {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 32px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quiz-action-btn:hover {
+    background: linear-gradient(135deg, #8f94fb, #4e54c8);
+    transform: translateY(-2px);
+}
+
+.quiz-action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.ai-feedback {
+    background: #f0f9ff;
+    border: 2px solid #0ea5e9;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.ai-feedback.correct {
+    background: #f0fdf4;
+    border-color: #22c55e;
+}
+
+.ai-feedback.incorrect {
+    background: #fef2f2;
+    border-color: #ef4444;
+}
+
+.ai-feedback h4 {
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+}
+
+.ai-feedback p {
+    margin: 0;
+    line-height: 1.5;
+}
+</style>
+
+<script>
+// ===================================================================
+// REAL AI INTEGRATION - OpenAI-Powered Quiz System
+// ===================================================================
+
+// Global quiz state
+let currentQuiz = null;
+let currentQuestion = 0;
+let selectedAnswer = null;
+let score = 0;
+let quizStartTime = null;
+let isLoadingQuiz = false;
+
+// Get CSRF token for Django API calls
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+}
+
+// AI INTEGRATION #1: Real-time AI Question Generation
+async function startQuiz(category) {
+    console.log('🤖 Starting AI-powered quiz for category:', category);
+    
+    if (isLoadingQuiz) {
+        console.log('Quiz already loading...');
+        return;
+    }
+    
+    isLoadingQuiz = true;
+    quizStartTime = Date.now();
+    
+    // Show loading state
+    showLoadingState(category);
+    
+    try {
+        // Call Django API to generate AI questions
+        const response = await fetch('/api/quiz/generate-questions/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({
+                category: category,
+                difficulty: 'intermediate',
+                count: 5
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success && data.questions.length > 0) {
+            currentQuiz = data.questions;
+            currentQuestion = 0;
+            selectedAnswer = null;
+            score = 0;
+            
+            console.log('✅ Generated', data.questions.length, 'AI questions for', category);
+            
+            // Hide category selection and show quiz interface
+            hideMainInterface();
+            showQuizInterface();
+            loadQuestion();
+        } else {
+            throw new Error(data.error || 'Failed to generate questions');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error generating AI quiz:', error);
+        alert('Sorry, there was an error generating your AI quiz. Please try again.');
+        showMainInterface();
+    } finally {
+        isLoadingQuiz = false;
+    }
+}
+
+function showLoadingState(category) {
+    const categoriesDiv = document.querySelector('.quiz-categories');
+    const statsDiv = document.querySelector('.quiz-stats');
+    const promptDiv = document.querySelector('.login-prompt');
+    const quizInterface = document.getElementById('quiz-interface');
+    
+    if (categoriesDiv) categoriesDiv.style.display = 'none';
+    if (statsDiv) statsDiv.style.display = 'none';
+    if (promptDiv) promptDiv.style.display = 'none';
+    
+    if (quizInterface) {
+        quizInterface.style.display = 'block';
+        quizInterface.innerHTML = `
+            <div class="quiz-card">
+                <div style="text-align: center; padding: 40px;">
+                    <div style="font-size: 3rem; margin-bottom: 20px;">🤖</div>
+                    <h2>AI is generating your ${category} quiz...</h2>
+                    <p style="color: #666; margin: 20px 0;">Please wait while we create personalized questions for you.</p>
+                    <div class="loading-spinner" style="margin: 20px auto; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #4e54c8; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </div>
+            </div>
+            <style>
+            @keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+            </style>
+        `;
+    }
+}
+
+function hideMainInterface() {
+    const categoriesDiv = document.querySelector('.quiz-categories');
+    const statsDiv = document.querySelector('.quiz-stats');
+    const promptDiv = document.querySelector('.login-prompt');
+    
+    if (categoriesDiv) categoriesDiv.style.display = 'none';
+    if (statsDiv) statsDiv.style.display = 'none';
+    if (promptDiv) promptDiv.style.display = 'none';
+}
+
+function showMainInterface() {
+    const categoriesDiv = document.querySelector('.quiz-categories');
+    const statsDiv = document.querySelector('.quiz-stats');
+    const promptDiv = document.querySelector('.login-prompt');
+    const quizInterface = document.getElementById('quiz-interface');
+    
+    if (categoriesDiv) categoriesDiv.style.display = 'grid';
+    if (statsDiv) statsDiv.style.display = 'block';
+    if (promptDiv) promptDiv.style.display = 'block';
+    if (quizInterface) quizInterface.style.display = 'none';
+}
+
+function showQuizInterface() {
+    const quizInterface = document.getElementById('quiz-interface');
+    if (quizInterface) {
+        quizInterface.style.display = 'block';
+        quizInterface.innerHTML = `
+            <div class="quiz-card">
+                <div class="quiz-progress">
+                    <div class="progress-bar">
+                        <div id="progress-fill" class="progress-fill"></div>
+                    </div>
+                    <span id="question-counter">Question 1 of 5</span>
+                </div>
+                
+                <div class="question-section">
+                    <h2 id="question-text">Loading question...</h2>
+                    <div id="options-container" class="options-container">
+                        <!-- Options will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="quiz-actions">
+                    <button id="submit-answer" class="quiz-action-btn" onclick="submitAnswer()">Submit Answer</button>
+                    <button id="next-question" class="quiz-action-btn" onclick="nextQuestion()" style="display: none;">Next Question</button>
+                </div>
+                
+                <!-- AI INTEGRATION #2: Real-time AI Feedback Display -->
+                <div id="ai-feedback" class="ai-feedback" style="display: none;">
+                    <!-- Real AI-generated explanations appear here -->
+                </div>
+            </div>
+        `;
+    }
+}
+
+function loadQuestion() {
+    const question = currentQuiz[currentQuestion];
+    
+    console.log('📝 Loading AI-generated question:', currentQuestion + 1);
+    
+    const questionText = document.getElementById('question-text');
+    const questionCounter = document.getElementById('question-counter');
+    const progressFill = document.getElementById('progress-fill');
+    
+    if (questionText) questionText.textContent = question.question;
+    if (questionCounter) questionCounter.textContent = `Question ${currentQuestion + 1} of ${currentQuiz.length}`;
+    
+    // Update progress bar
+    const progress = ((currentQuestion + 1) / currentQuiz.length) * 100;
+    if (progressFill) progressFill.style.width = progress + '%';
+    
+    // Load options
+    const optionsContainer = document.getElementById('options-container');
+    if (optionsContainer) {
+        optionsContainer.innerHTML = '';
+        
+        question.options.forEach((option, index) => {
+            const optionBtn = document.createElement('button');
+            optionBtn.className = 'option-btn';
+            optionBtn.textContent = option;
+            optionBtn.onclick = () => selectOption(index);
+            optionsContainer.appendChild(optionBtn);
+        });
+    }
+    
+    // Reset UI state
+    selectedAnswer = null;
+    const submitBtn = document.getElementById('submit-answer');
+    const nextBtn = document.getElementById('next-question');
+    const feedbackDiv = document.getElementById('ai-feedback');
+    
+    if (submitBtn) submitBtn.style.display = 'block';
+    if (nextBtn) nextBtn.style.display = 'none';
+    if (feedbackDiv) feedbackDiv.style.display = 'none';
+}
+
+function selectOption(index) {
+    console.log('Selected option:', index);
+    
+    // Remove previous selection
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+    
+    // Mark new selection
+    const optionBtns = document.querySelectorAll('.option-btn');
+    if (optionBtns[index]) {
+        optionBtns[index].classList.add('selected');
+    }
+    selectedAnswer = index;
+}
+
+// AI INTEGRATION #3: Real-time AI Explanation Generation
+async function submitAnswer() {
+    console.log('🤖 Submitting answer for AI analysis:', selectedAnswer);
+    
+    if (selectedAnswer === null) {
+        alert('Please select an answer!');
+        return;
+    }
+    
+    const question = currentQuiz[currentQuestion];
+    const isCorrect = selectedAnswer === question.correct;
+    
+    if (isCorrect) {
+        score++;
+    }
+    
+    // Show correct/incorrect styling
+    document.querySelectorAll('.option-btn').forEach((btn, index) => {
+        if (index === question.correct) {
+            btn.classList.add('correct');
+        } else if (index === selectedAnswer && !isCorrect) {
+            btn.classList.add('incorrect');
+        }
+        btn.disabled = true;
+    });
+    
+    // Generate real AI explanation
+    await showAIFeedback(question, selectedAnswer, isCorrect);
+    
+    // Update buttons
+    const submitBtn = document.getElementById('submit-answer');
+    const nextBtn = document.getElementById('next-question');
+    
+    if (submitBtn) submitBtn.style.display = 'none';
+    
+    if (nextBtn) {
+        if (currentQuestion < currentQuiz.length - 1) {
+            nextBtn.textContent = 'Next Question';
+            nextBtn.onclick = nextQuestion;
+            nextBtn.style.display = 'block';
+        } else {
+            nextBtn.textContent = 'View AI Assessment';
+            nextBtn.onclick = showResults;
+            nextBtn.style.display = 'block';
+        }
+    }
+}
+
+// AI INTEGRATION #4: Dynamic AI Explanation Generation
+async function showAIFeedback(question, userAnswerIndex, isCorrect) {
+    const feedbackDiv = document.getElementById('ai-feedback');
+    if (!feedbackDiv) return;
+    
+    feedbackDiv.className = 'ai-feedback ' + (isCorrect ? 'correct' : 'incorrect');
+    
+    // Show loading state for AI explanation
+    feedbackDiv.innerHTML = `
+        <h4>${isCorrect ? '🎉 Correct!' : '❌ Incorrect'}</h4>
+        <p><strong>AI is analyzing your answer...</strong></p>
+        <div class="loading-spinner" style="width: 20px; height: 20px; border: 2px solid #f3f3f3; border-top: 2px solid #4e54c8; border-radius: 50%; animation: spin 1s linear infinite; margin: 10px 0;"></div>
+    `;
+    feedbackDiv.style.display = 'block';
+    
+    try {
+        // Call Django API for AI explanation
+        const response = await fetch('/api/quiz/generate-explanation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({
+                question: question.question,
+                user_answer: question.options[userAnswerIndex],
+                correct_answer: question.options[question.correct],
+                is_correct: isCorrect
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Display real AI explanation
+            feedbackDiv.innerHTML = `
+                <h4>${isCorrect ? '🎉 Correct!' : '❌ Incorrect'}</h4>
+                <p><strong>🤖 AI Explanation:</strong> ${data.explanation}</p>
+            `;
+            console.log('✅ Generated AI explanation');
+        } else {
+            throw new Error(data.error || 'Failed to generate explanation');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error generating AI explanation:', error);
+        // Fallback to basic explanation
+        feedbackDiv.innerHTML = `
+            <h4>${isCorrect ? '🎉 Correct!' : '❌ Incorrect'}</h4>
+            <p><strong>Explanation:</strong> ${question.explanation || 'The correct answer is: ' + question.options[question.correct]}</p>
+        `;
+    }
+}
+
+function nextQuestion() {
+    currentQuestion++;
+    loadQuestion();
+}
+
+// AI INTEGRATION #5: Comprehensive AI Performance Assessment
+async function showResults() {
+    console.log('🤖 Generating AI performance assessment...');
+    
+    const quizInterface = document.getElementById('quiz-interface');
+    const percentage = Math.round((score / currentQuiz.length) * 100);
+    const timeTaken = Math.round((Date.now() - quizStartTime) / 1000);
+    
+    // Show loading state for AI assessment
+    if (quizInterface) {
+        quizInterface.innerHTML = `
+            <div class="quiz-card">
+                <div style="text-align: center;">
+                    <h2>Quiz Complete!</h2>
+                    <div style="font-size: 3rem; margin: 20px 0;">${percentage}%</div>
+                    <p>You scored ${score} out of ${currentQuiz.length} questions correctly.</p>
+                    <p><strong>🤖 AI is analyzing your performance...</strong></p>
+                    <div class="loading-spinner" style="margin: 20px auto; width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid #4e54c8; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    try {
+        // Get current category from first question (if available)
+        const category = 'general'; // You might want to track this during quiz generation
+        
+        // Call Django API for AI performance assessment
+        const response = await fetch('/api/quiz/generate-assessment/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken(),
+            },
+            body: JSON.stringify({
+                score: score,
+                total: currentQuiz.length,
+                category: category,
+                time_taken: timeTaken
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Display AI assessment
+            if (quizInterface) {
+                quizInterface.innerHTML = `
+                    <div class="quiz-card">
+                        <div style="text-align: center;">
+                            <h2>🎉 Quiz Complete!</h2>
+                            <div style="font-size: 3rem; margin: 20px 0;">${percentage}%</div>
+                            <p>You scored ${score} out of ${currentQuiz.length} questions correctly in ${timeTaken} seconds.</p>
+                            <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; border-left: 4px solid #4e54c8;">
+                                <p><strong>🤖 AI Performance Assessment:</strong></p>
+                                <p style="font-style: italic; margin: 10px 0;">${data.assessment}</p>
+                            </div>
+                            <button class="quiz-action-btn" onclick="location.reload()">Take Another AI Quiz</button>
+                        </div>
+                    </div>
+                `;
+            }
+            console.log('✅ Generated AI performance assessment');
+        } else {
+            throw new Error(data.error || 'Failed to generate assessment');
+        }
+        
+    } catch (error) {
+        console.error('❌ Error generating AI assessment:', error);
+        // Fallback assessment
+        let fallbackMessage = '';
+        if (percentage >= 80) {
+            fallbackMessage = 'Outstanding performance! You have excellent knowledge in this area.';
+        } else if (percentage >= 60) {
+            fallbackMessage = 'Good work! Continue practicing to improve further.';
+        } else {
+            fallbackMessage = 'Keep learning! Practice will help you improve.';
+        }
+        
+        if (quizInterface) {
+            quizInterface.innerHTML = `
+                <div class="quiz-card">
+                    <div style="text-align: center;">
+                        <h2>Quiz Complete!</h2>
+                        <div style="font-size: 3rem; margin: 20px 0;">${percentage}%</div>
+                        <p>You scored ${score} out of ${currentQuiz.length} questions correctly in ${timeTaken} seconds.</p>
+                        <p><strong>Assessment:</strong> ${fallbackMessage}</p>
+                        <button class="quiz-action-btn" onclick="location.reload()">Take Another Quiz</button>
+                    </div>
+                </div>
+            `;
+        }
+    }
+}
+
+// Debug function to test AI integration
+function testAIIntegration() {
+    console.log('🤖 Testing AI integration...');
+    fetch('/api/quiz/generate-questions/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({
+            category: 'python',
+            difficulty: 'beginner',
+            count: 1
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('✅ AI API Test Result:', data);
+        alert('AI Integration Test: ' + (data.success ? 'SUCCESS' : 'FAILED'));
+    })
+    .catch(error => {
+        console.error('❌ AI API Test Error:', error);
+        alert('AI Integration Test: FAILED - ' + error.message);
+    });
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🤖 AI-Powered Quiz System Initialized');
+    console.log('🚀 Real OpenAI integration active!');
+    
+    // Add test button for AI integration (development only)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = '🧪 Test AI';
+        testBtn.onclick = testAIIntegration;
+        testBtn.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px; background: #4e54c8; color: white; border: none; border-radius: 5px; cursor: pointer;';
+        document.body.appendChild(testBtn);
+    }
+});
+</script>
+{% endblock %}
