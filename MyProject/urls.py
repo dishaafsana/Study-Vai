@@ -9,7 +9,22 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", views.home, name="home"),
     path("signup/", views.signup, name="signup"),
-    # users gular jonno
+    path("quiz/", views.quiz, name="quiz"),
+    # AI-Powered Quiz API Endpoints
+    path(
+        "api/quiz/generate-questions/", views.generate_quiz_questions, name="api_generate_questions"
+    ),
+    path(
+        "api/quiz/generate-explanation/",
+        views.generate_explanation,
+        name="api_generate_explanation",
+    ),
+    path(
+        "api/quiz/generate-assessment/",
+        views.generate_performance_assessment,
+        name="api_generate_assessment",
+    ),
+    # Other app urls
     path("", include("users.urls")),
     path("", include("Groups.urls")),
     path("", include("notes.urls")),

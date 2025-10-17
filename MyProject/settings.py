@@ -1,6 +1,9 @@
 import os
-
+from dotenv import load_dotenv
 from pathlib import Path
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -9,10 +12,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-^^^v)rv3al^5jb@$@ff-_x7wk9uwj-+f*^2n7an*kb0lv1u(a1"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
 # Allow all hosts during development. For production, specify allowed hosts.
 ALLOWED_HOSTS = []
+
+# OpenAI Configuration
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# OPENAI_MODEL is optional; when absent, Deepseek can be used as the primary provider
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", None)
+
+# Deepseek (primary AI provider) - optional
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
+DEEPSEEK_API_BASE = os.getenv("DEEPSEEK_API_BASE", "https://api.deepseek.com")
 
 # Application definition
 INSTALLED_APPS = [
@@ -26,7 +38,7 @@ INSTALLED_APPS = [
     "notes",
     "routine",
     "users",
-    # Aikhne app create kore add korsi
+    # Add your 'Groups' app here
 ]
 
 MIDDLEWARE = [
