@@ -20,7 +20,7 @@ class Routine(models.Model):
     ]
 
     day = models.CharField(max_length=10, choices=DAY_CHOICES)
-    time_slot = models.CharField(max_length=5, choices=TIME_SLOT_CHOICES)
+    time_slot  = models.CharField(max_length=5, choices=TIME_SLOT_CHOICES)
     Group_code = models.CharField(max_length=20)
     Group_name = models.CharField(max_length=100, blank=True)
 
