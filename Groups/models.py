@@ -8,6 +8,7 @@ class Instructor(models.Model):
     def __str__(self):
         return self.name
 
+ # Removed rating, review_count, and enrollment_year fields and related methods
 
 class Group(models.Model):
     title = models.CharField(max_length=200)
